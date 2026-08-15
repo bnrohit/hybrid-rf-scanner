@@ -1,2 +1,2 @@
 # Install librealsense compatible with your OS/JetPack first.
-pyrealsense2>=2.55
+pyrealsense2>=2.58.3.10794
