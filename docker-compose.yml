@@ -3,6 +3,9 @@ services:
     build: .
     restart: unless-stopped
     command: ["hybrid-scanner", "run", "--simulation", "--api"]
+    environment:
+      HYBRID_SCANNER_API_HOST: 0.0.0.0
+      HYBRID_SCANNER_API_TOKEN: ${HYBRID_SCANNER_API_TOKEN:?Set HYBRID_SCANNER_API_TOKEN before docker compose up}
     ports:
       - "127.0.0.1:8080:8080"
     volumes:

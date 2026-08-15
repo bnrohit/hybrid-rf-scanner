@@ -9,9 +9,10 @@ StartLimitBurst=5
 Type=simple
 User=scanner
 Group=scanner
-SupplementaryGroups=dialout video render
+SupplementaryGroups=dialout video
 WorkingDirectory=/opt/hybrid-rf-scanner
 Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
 EnvironmentFile=-/etc/hybrid-rf-scanner.env
 ExecStart=/opt/hybrid-rf-scanner/.venv/bin/hybrid-scanner run --mode fused --api
 Restart=on-failure

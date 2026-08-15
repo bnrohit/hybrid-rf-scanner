@@ -85,6 +85,8 @@ class ScannerEngine:
         self.vision = None
         self.workers: list[ReconnectingWorker] = []
         self.api_thread = None
+        self.api_server = None
+        self.last_good_sync_ns: int | None = None
 
     def _start_api(self) -> None:
         app = build_app(
@@ -94,8 +96,16 @@ class ScannerEngine:
             allow_loopback_without_token=self.cfg.api.allow_unauthenticated_loopback,
         )
 
+        config = uvicorn.Config(
+            app,
+            host=self.cfg.api.host,
+            port=self.cfg.api.port,
+            log_level="warning",
+        )
+        self.api_server = uvicorn.Server(config)
+
         def serve() -> None:
-            uvicorn.run(app, host=self.cfg.api.host, port=self.cfg.api.port, log_level="warning")
+            self.api_server.run()
 
         self.api_thread = threading.Thread(target=serve, daemon=True, name="api-server")
         self.api_thread.start()
@@ -166,7 +176,7 @@ class ScannerEngine:
     def _signal_handler(self, *_args) -> None:
         self.stop_event.set()
 
-    def _ready(self, sensors: dict) -> bool:
+    def _healthy(self, sensors: dict) -> bool:
         if self.simulation:
             return True
         if self.mode == "radar-only":
@@ -174,6 +184,17 @@ class ScannerEngine:
         if self.mode == "vision-only":
             return not sensors["vision"]["stale"]
         return not sensors["radar"]["stale"] and not sensors["vision"]["stale"]
+
+    def _sync_ok(self, now_ns: int) -> bool:
+        if self.simulation or self.mode != "fused":
+            return True
+        if self.last_good_sync_ns is None:
+            return False
+        age_ms = max(0.0, (now_ns - self.last_good_sync_ns) / 1e6)
+        return age_ms <= self.cfg.sync.stale_sensor_ms
+
+    def _ready(self, sensors: dict, now_ns: int) -> bool:
+        return self._healthy(sensors) and self._sync_ok(now_ns)
 
     def _record_event(self, radar, vision, measurements, tracks, guidance, skew_ms) -> None:
         if not self.recorder:
@@ -207,93 +228,124 @@ class ScannerEngine:
             except ValueError:
                 pass
 
-        if self.api_enabled:
-            self._start_api()
-
-        if not self.simulation:
-            self._build_hardware()
-            for worker in self.workers:
-                worker.start()
-
         period = 1.0 / self.cfg.app.loop_hz
-        last_frame_number = -1
-        logger.info("Scanner started in {} mode", "simulation" if self.simulation else self.mode)
+        last_radar_timestamp_ns = -1
 
         try:
+            # Validate/build hardware before opening the API so configuration
+            # failures do not leave a misleading service endpoint behind.
+            if not self.simulation:
+                self._build_hardware()
+
+            if self.api_enabled:
+                self._start_api()
+
+            if not self.simulation:
+                for worker in self.workers:
+                    worker.start()
+
+            logger.info("Scanner started in {} mode", "simulation" if self.simulation else self.mode)
+
             while not self.stop_event.is_set():
                 started = time.monotonic()
                 now_ns = time.monotonic_ns()
 
                 if self.simulation:
+                    assert self.sim is not None
                     radar, vision = self.sim.next()
                     self.health.frame("radar", radar.timestamp_ns)
                     self.health.frame("vision", vision.timestamp_ns)
                     skew_ms = abs(radar.timestamp_ns - vision.timestamp_ns) / 1e6
+                    self.last_good_sync_ns = now_ns
                 elif self.mode == "vision-only":
-                    # Vision-only mode is a hardware diagnostics mode; there is no radar measurement to fuse.
                     sensors = self.health.snapshot(now_ns)
+                    healthy = self._healthy(sensors)
                     self.store.update(
-                        healthy=not sensors["vision"]["stale"],
-                        ready=self._ready(sensors),
+                        healthy=healthy,
+                        ready=self._ready(sensors, now_ns),
                         sensors=sensors,
                         measurements=[],
                         tracks=[],
+                        sync_ok=True,
                     )
                     self.stop_event.wait(period)
                     continue
                 else:
-                    radar = self.bus.latest_radar_after(last_frame_number)
+                    radar = self.bus.latest_radar_after_timestamp(last_radar_timestamp_ns)
                     if radar is None:
                         sensors = self.health.snapshot(now_ns)
+                        healthy = self._healthy(sensors)
                         self.store.update(
-                            healthy=self._ready(sensors),
-                            ready=self._ready(sensors),
+                            healthy=healthy,
+                            ready=self._ready(sensors, now_ns),
                             sensors=sensors,
+                            sync_ok=self._sync_ok(now_ns),
                         )
                         self.stop_event.wait(min(period, 0.02))
                         continue
                     if self.mode == "fused":
-                        vision, skew_ms = self.bus.nearest_vision(radar.timestamp_ns, self.cfg.sync.max_skew_ms)
+                        vision, skew_ms = self.bus.nearest_vision(
+                            radar.timestamp_ns, self.cfg.sync.max_skew_ms
+                        )
+                        if vision is not None:
+                            self.last_good_sync_ns = now_ns
                     else:
                         vision, skew_ms = None, None
 
-                last_frame_number = radar.frame_number
+                last_radar_timestamp_ns = radar.timestamp_ns
                 radar_trust = self.health.trust("radar", now_ns)
-                vision_trust = 0.0 if self.mode == "radar-only" else self.health.trust("vision", now_ns)
+                vision_trust = (
+                    0.0 if self.mode == "radar-only" else self.health.trust("vision", now_ns)
+                )
                 measurements = self.fusion.fuse(
                     radar,
                     vision,
                     radar_trust=radar_trust,
                     vision_trust=vision_trust,
                 )
+
                 if self.cfg.calibration_monitor.enabled and vision is not None:
                     self.calibration_monitor.update(measurements)
                 calibration = self.calibration_monitor.snapshot()
-                tracks = self.tracker.update(measurements, radar.timestamp_ns)
-                if self.cfg.mapping.enabled:
+
+                tracks = (
+                    self.tracker.update(measurements, radar.timestamp_ns)
+                    if self.cfg.tracker.enabled
+                    else []
+                )
+                if self.cfg.mapping.enabled and tracks:
                     self.scene_map.update(tracks, now_ns)
                 guidance = (
                     self.advisor.recommend(tracks, self.scene_map)
-                    if self.cfg.research.active_scan_guidance
+                    if self.cfg.research.active_scan_guidance and tracks
                     else None
                 )
 
                 sensors = self.health.snapshot(now_ns)
-                ready = self._ready(sensors)
+                healthy = self._healthy(sensors)
+                ready = self._ready(sensors, now_ns)
                 if self.cfg.calibration_monitor.fail_readiness_on_drift and calibration["degraded"]:
                     ready = False
+
+                recorder_state = (
+                    {"written": 0, "dropped": 0, "last_error": None, "queue_depth": 0}
+                    if self.recorder is None
+                    else self.recorder.snapshot()
+                )
                 self.store.update(
-                    healthy=ready,
+                    healthy=healthy,
                     ready=ready,
                     calibration=calibration,
                     frame_number=radar.frame_number,
                     sync_skew_ms=skew_ms,
+                    sync_ok=self._sync_ok(now_ns),
                     measurements=[m.to_dict() for m in measurements[:50]],
                     tracks=[t.to_dict() for t in tracks[:50]],
                     guidance=guidance.to_dict() if guidance else None,
                     sensors=sensors,
-                    last_error=None,
-                    recorder_dropped=0 if self.recorder is None else self.recorder.dropped,
+                    last_error=recorder_state.get("last_error"),
+                    recorder=recorder_state,
+                    recorder_dropped=recorder_state.get("dropped", 0),
                 )
 
                 FRAMES.inc()
@@ -317,6 +369,10 @@ class ScannerEngine:
             self.stop_event.set()
             for worker in self.workers:
                 worker.stop()
+            if self.api_server is not None:
+                self.api_server.should_exit = True
+            if self.api_thread is not None and self.api_thread.is_alive():
+                self.api_thread.join(timeout=3)
             if self.recorder:
                 self.recorder.close()
             logger.info("Scanner stopped")

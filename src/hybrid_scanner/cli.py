@@ -16,9 +16,13 @@ app = typer.Typer(no_args_is_help=True, help="Hybrid RF Scanner control CLI")
 
 
 @app.command()
-def doctor(config: str = typer.Option("config/scanner_config.yaml", "--config", "-c")) -> None:
+def doctor(
+    config: str = typer.Option("config/scanner_config.yaml", "--config", "-c"),
+    hardware: bool = typer.Option(False, "--hardware", help="Fail if required hardware is unavailable"),
+) -> None:
     """Validate config, runtime, device paths, permissions, and optional SDKs."""
     cfg = load_config(config)
+    failures: list[str] = []
     typer.echo(f"Hybrid RF Scanner: {__version__}")
     typer.echo(f"Python: {sys.version.split()[0]}")
     typer.echo(f"OS: {platform.platform()}")
@@ -29,9 +33,13 @@ def doctor(config: str = typer.Option("config/scanner_config.yaml", "--config", 
         exists = p.exists()
         rw = os.access(p, os.R_OK | os.W_OK) if exists else False
         typer.echo(f"{label}: {'FOUND' if exists else 'NOT FOUND'}; rw={rw}; {path}")
+        if hardware and (not exists or not rw):
+            failures.append(f"{label} is unavailable or lacks read/write permission")
 
     profile = Path(cfg.radar.profile_path)
     typer.echo(f"Radar profile: {'FOUND' if profile.exists() else 'NOT FOUND'} ({profile})")
+    if hardware and not profile.exists():
+        failures.append("radar profile is missing")
     typer.echo(
         "Fusion calibration: "
         + (
@@ -46,12 +54,22 @@ def doctor(config: str = typer.Option("config/scanner_config.yaml", "--config", 
         ctx = rs.context()
         devices = list(ctx.query_devices())
         typer.echo(f"pyrealsense2: installed; devices={len(devices)}")
+        if hardware and cfg.vision.enabled and not devices:
+            failures.append("no RealSense device detected")
     except Exception as exc:
         typer.echo(f"pyrealsense2: unavailable or no usable runtime ({exc})")
+        if hardware and cfg.vision.enabled:
+            failures.append("RealSense runtime/device unavailable")
 
     if cfg.api.host not in {"127.0.0.1", "localhost", "::1"} and not cfg.api.token():
         typer.echo("SECURITY: remote API bind requires HYBRID_SCANNER_API_TOKEN")
+    if hardware and not cfg.fusion.calibration_validated:
+        failures.append("fusion calibration is not validated")
     typer.echo("Simulation mode: READY")
+    if failures:
+        for failure in failures:
+            typer.echo(f"FAIL: {failure}", err=True)
+        raise typer.Exit(code=1)
 
 
 @app.command()

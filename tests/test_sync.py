@@ -21,3 +21,13 @@ def test_latest_radar_is_not_replayed():
     bus.add_radar(frame)
     assert bus.latest_radar_after(-1) is frame
     assert bus.latest_radar_after(7) is None
+
+
+def test_timestamp_based_radar_delivery_survives_frame_number_reset():
+    bus = FrameBus(10)
+    first = RadarFrame(frame_number=99, timestamp_ns=100, points=[])
+    reset = RadarFrame(frame_number=1, timestamp_ns=200, points=[])
+    bus.add_radar(first)
+    assert bus.latest_radar_after_timestamp(-1) is first
+    bus.add_radar(reset)
+    assert bus.latest_radar_after_timestamp(100) is reset

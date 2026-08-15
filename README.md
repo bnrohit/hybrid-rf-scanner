@@ -1,4 +1,4 @@
-# Hybrid RF Scanner 2.0
+# Hybrid RF Scanner 2.0.1
 
 Production-grade **foundation** for a real-time TI IWR6843 + RealSense D435i sensing product.
 
@@ -125,3 +125,30 @@ See:
 - `docs/PRODUCTION_CHECKLIST.md`
 
 No claim is made that these concepts are globally unprecedented. A patent/novelty claim needs a formal prior-art search.
+
+
+## GitHub push troubleshooting
+
+If GitHub briefly reports repository size `0`, verify the actual commit/tree before concluding the push failed; repository metadata can lag. Check the remote, branch, and recent commits:
+
+```bash
+git status -sb
+git remote -v
+git branch --show-current
+git log --oneline -5
+```
+
+For HTTPS/CLI authentication:
+
+```bash
+gh auth status
+gh auth setup-git
+git push -u origin main
+```
+
+For Docker Compose, set an API token first because the app binds to all container interfaces while the published host port remains loopback-only:
+
+```bash
+export HYBRID_SCANNER_API_TOKEN=$(python -c 'import secrets; print(secrets.token_urlsafe(32))')
+docker compose up --build
+```

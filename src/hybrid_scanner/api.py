@@ -47,17 +47,16 @@ def build_app(store: StatusStore, *, token: str | None, host: str, allow_loopbac
         if authorization is None or not hmac.compare_digest(authorization, expected):
             raise HTTPException(status_code=401, detail="invalid bearer token")
 
-    app = FastAPI(title="Hybrid RF Scanner", version="2.0.0")
+    app = FastAPI(title="Hybrid RF Scanner", version="2.0.1")
 
     @app.get("/health")
     async def health():
         snap = store.snapshot()
+        # Keep unauthenticated liveness deliberately low-information. Detailed
+        # sensor state and errors are available from the authenticated /status.
         return {
             "ok": bool(snap.get("healthy")),
             "ready": bool(snap.get("ready")),
-            "last_error": snap.get("last_error"),
-            "calibration": snap.get("calibration", {}),
-            "sensors": snap.get("sensors", {}),
         }
 
     @app.get("/ready")
@@ -84,10 +83,10 @@ def build_app(store: StatusStore, *, token: str | None, host: str, allow_loopbac
         try:
             installed = package_version("hybrid-rf-scanner")
         except Exception:
-            installed = "2.0.0"
+            installed = "2.0.1"
         return {"version": installed}
 
-    @app.get("/metrics")
+    @app.get("/metrics", dependencies=[Depends(auth)])
     async def metrics():
         return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
@@ -111,7 +110,7 @@ def build_app(store: StatusStore, *, token: str | None, host: str, allow_loopbac
         return HTMLResponse("""
 <!doctype html><html><head><meta charset='utf-8'><title>Hybrid RF Scanner</title>
 <style>body{font-family:system-ui;margin:2rem;max-width:1000px}pre{background:#111;color:#eee;padding:1rem;overflow:auto}.ok{font-weight:700}</style></head>
-<body><h1>Hybrid RF Scanner 2.0</h1><p id='state'>Loading health…</p>
+<body><h1>Hybrid RF Scanner 2.0.1</h1><p id='state'>Loading health…</p>
 <p>Detailed status is protected when API authentication is enabled.</p><pre id='health'></pre>
 <script>async function tick(){try{let r=await fetch('/health');let j=await r.json();document.getElementById('state').textContent=j.ok?'HEALTHY':'NOT READY';document.getElementById('health').textContent=JSON.stringify(j,null,2)}catch(e){document.getElementById('state').textContent=e}}setInterval(tick,1000);tick()</script></body></html>
 """)

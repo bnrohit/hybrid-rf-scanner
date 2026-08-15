@@ -17,6 +17,7 @@ class StatusStore:
             "mode": "unknown",
             "frame_number": 0,
             "sync_skew_ms": None,
+            "sync_ok": False,
             "measurements": [],
             "tracks": [],
             "guidance": None,
@@ -24,6 +25,7 @@ class StatusStore:
             "sensors": {},
             "last_update_monotonic_ns": None,
             "last_error": None,
+            "recorder": {},
             "recorder_dropped": 0,
         }
 

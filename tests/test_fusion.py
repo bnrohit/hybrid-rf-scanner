@@ -24,3 +24,18 @@ def test_fusion_uses_near_depth_geometry():
     assert len(out) == 1
     assert out[0].nearest_depth_distance_m < 0.03
     assert out[0].confidence > 0.5
+
+
+def test_zero_radar_trust_emits_nothing():
+    radar = RadarFrame(1, 100, [RadarPoint(0, 1, 0, 0, snr_db=40)])
+    vision = VisionFrame(100, np.array([[0.0, 1.0, 0.0]] * 10, dtype=float))
+    assert engine().fuse(radar, vision, radar_trust=0.0, vision_trust=1.0) == []
+
+
+def test_uncorroborated_measurement_is_penalized():
+    radar = RadarFrame(1, 100, [RadarPoint(0, 1, 0, 0, snr_db=20)])
+    vision = VisionFrame(100, np.array([[5.0, 5.0, 5.0]] * 10, dtype=float))
+    out = engine().fuse(radar, vision)
+    assert out
+    assert out[0].visibility_state == "uncorroborated_or_occluded"
+    assert out[0].confidence < 0.8

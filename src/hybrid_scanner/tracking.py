@@ -80,7 +80,11 @@ class MultiTargetTracker:
         k = track.p @ h.T @ np.linalg.pinv(s)
         track.x = track.x + k @ innovation
         i = np.eye(6)
-        track.p = (i - k @ h) @ track.p
+        # Joseph stabilized covariance update preserves symmetry/PSD better than
+        # the simplified (I-KH)P form under finite precision.
+        ikh = i - k @ h
+        track.p = ikh @ track.p @ ikh.T + k @ r @ k.T
+        track.p = 0.5 * (track.p + track.p.T)
         track.hits += 1
         track.misses = 0
         track.confidence = float(np.clip(0.70 * track.confidence + 0.30 * m.confidence, 0, 1))

@@ -1,16 +1,21 @@
-.PHONY: install dev test lint sim doctor manifest clean
+.PHONY: install dev test lint check sim doctor manifest clean
 
 install:
 	python -m pip install -e .
 
 dev:
-	python -m pip install -e .[dev]
+	python -m pip install -e '.[dev]'
 
 test:
 	pytest -q
 
 lint:
 	ruff check src tests scripts
+
+check:
+	python -m compileall -q src tests scripts
+	pytest -q
+	python -m pip check
 
 sim:
 	hybrid-scanner run --simulation --api

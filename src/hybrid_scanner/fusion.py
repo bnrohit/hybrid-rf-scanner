@@ -11,9 +11,9 @@ from hybrid_scanner.models import FusedMeasurement, RadarFrame, RadarPoint, Visi
 class FusionEngine:
     """Uncertainty-aware radar/depth correlation.
 
-    This is deliberately not an object-identity classifier. It converts sensor
-    agreement, SNR, calibration, and sensor trust into a bounded measurement
-    confidence and covariance that downstream tracking can reason about.
+    This module produces measurements, not semantic object identity. Confidence is
+    explicitly trust-gated: a stale/unhealthy radar can never create a high-confidence
+    target merely because its last SNR value looked good.
     """
 
     def __init__(
@@ -65,14 +65,21 @@ class FusionEngine:
         radar_trust = float(np.clip(radar_trust, 0.0, 1.0))
         vision_trust = float(np.clip(vision_trust, 0.0, 1.0))
 
+        # Radar is the primary sensor. With essentially zero radar trust there is no
+        # defensible radar-derived measurement to emit.
+        if radar_trust <= 0.01:
+            return out
+
         for rp in radar.points:
             if rp.snr_db is not None and rp.snr_db < self.min_snr_db:
                 continue
 
             radar_pos = self._transform(rp)
-            sigma_r = self._radar_sigma(rp.snr_db)
-            snr_score = 0.55 if rp.snr_db is None else float(
-                np.clip((rp.snr_db - self.min_snr_db) / 20.0, 0.0, 1.0)
+            sigma_r = self._radar_sigma(rp.snr_db) / math.sqrt(max(radar_trust, 0.05))
+            snr_score = (
+                0.55
+                if rp.snr_db is None
+                else float(np.clip((rp.snr_db - self.min_snr_db) / 20.0, 0.0, 1.0))
             )
 
             nearest_distance = None
@@ -82,15 +89,27 @@ class FusionEngine:
             sigma = sigma_r
 
             if tree is not None and vision_points is not None:
-                dist, idx = tree.query(radar_pos, k=1)
-                nearest_distance = float(dist)
-                if nearest_distance <= self.max_pairing_distance_m:
+                # Multiple-neighbor support is less sensitive to one accidental depth
+                # pixel than a single nearest-neighbor lookup.
+                k = min(6, len(vision_points))
+                distances, indices = tree.query(radar_pos, k=k)
+                distances = np.atleast_1d(distances).astype(np.float64)
+                indices = np.atleast_1d(indices)
+                nearest_distance = float(distances[0])
+                local_distance = float(np.median(distances))
+
+                if local_distance <= self.max_pairing_distance_m:
                     visibility_state = "corroborated"
                     geometry_score = math.exp(
-                        -0.5 * (nearest_distance / max(self.max_pairing_distance_m / 2.0, 1e-6)) ** 2
+                        -0.5
+                        * (
+                            local_distance
+                            / max(self.max_pairing_distance_m / 2.0, 1e-6)
+                        )
+                        ** 2
                     )
-                    vision_pos = vision_points[int(idx)]
-                    # Independent Gaussian measurement fusion.
+                    local_points = vision_points[indices.astype(int)]
+                    vision_pos = np.mean(local_points, axis=0)
                     wr = radar_trust / max(sigma_r**2, 1e-9)
                     wv = vision_trust / max(self.vision_sigma**2, 1e-9)
                     total = wr + wv
@@ -99,12 +118,14 @@ class FusionEngine:
                         sigma = math.sqrt(1.0 / total)
                 else:
                     visibility_state = "uncorroborated_or_occluded"
-                    geometry_score = 0.0
 
-            trust_score = 0.65 * radar_trust + 0.35 * vision_trust
-            confidence = 0.52 * snr_score + 0.28 * geometry_score + 0.20 * trust_score
-            if tree is None:
-                confidence *= self.no_vision_penalty
+            radar_evidence = radar_trust * (0.65 * snr_score + 0.35)
+            if visibility_state == "corroborated":
+                vision_evidence = vision_trust * geometry_score
+                confidence = 0.72 * radar_evidence + 0.28 * vision_evidence
+            else:
+                confidence = radar_evidence * self.no_vision_penalty
+
             confidence = float(np.clip(confidence, 0.0, 1.0))
             if confidence < self.min_confidence:
                 continue

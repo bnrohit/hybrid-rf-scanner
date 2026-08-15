@@ -32,7 +32,15 @@ class FrameBus:
                 self.vision_overwrites += 1
             self._vision.append(frame)
 
+    def latest_radar_after_timestamp(self, timestamp_ns: int) -> RadarFrame | None:
+        with self._lock:
+            if not self._radar:
+                return None
+            latest = self._radar[-1]
+            return None if latest.timestamp_ns <= timestamp_ns else latest
+
     def latest_radar_after(self, frame_number: int) -> RadarFrame | None:
+        """Backward-compatible frame-number helper used by older callers/tests."""
         with self._lock:
             if not self._radar:
                 return None

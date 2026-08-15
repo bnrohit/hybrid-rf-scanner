@@ -39,6 +39,12 @@ class RadarConfig(BaseModel):
     reconnect_initial_s: float = Field(default=0.5, gt=0, le=30)
     reconnect_max_s: float = Field(default=10.0, gt=0, le=300)
 
+    @model_validator(mode="after")
+    def reconnect_order(self):
+        if self.reconnect_max_s < self.reconnect_initial_s:
+            raise ValueError("reconnect_max_s must be >= reconnect_initial_s")
+        return self
+
 
 class VisionConfig(BaseModel):
     enabled: bool = True
@@ -57,6 +63,8 @@ class VisionConfig(BaseModel):
     def depth_order(self):
         if self.max_depth_m <= self.min_depth_m:
             raise ValueError("max_depth_m must exceed min_depth_m")
+        if self.reconnect_max_s < self.reconnect_initial_s:
+            raise ValueError("reconnect_max_s must be >= reconnect_initial_s")
         return self
 
 
@@ -96,7 +104,13 @@ class FusionConfig(BaseModel):
             raise ValueError("transform rotation determinant must be approximately +1")
         return value
 
-
+    @model_validator(mode="after")
+    def validated_calibration_has_metrics(self):
+        if self.calibration_validated and (self.calibration_rmse_m is None or self.calibration_p95_m is None):
+            raise ValueError(
+                "calibration_validated=true requires calibration_rmse_m and calibration_p95_m"
+            )
+        return self
 
 
 class CalibrationMonitorConfig(BaseModel):
@@ -106,6 +120,12 @@ class CalibrationMonitorConfig(BaseModel):
     median_warn_m: float = Field(default=0.12, gt=0, le=5)
     p95_warn_m: float = Field(default=0.25, gt=0, le=10)
     fail_readiness_on_drift: bool = False
+
+    @model_validator(mode="after")
+    def sample_window_order(self):
+        if self.min_samples > self.window_size:
+            raise ValueError("calibration monitor min_samples must be <= window_size")
+        return self
 
 
 class TrackerConfig(BaseModel):
@@ -147,13 +167,13 @@ class ScannerConfig(BaseModel):
     app: AppConfig
     radar: RadarConfig
     vision: VisionConfig
-    sync: SyncConfig = SyncConfig()
+    sync: SyncConfig = Field(default_factory=SyncConfig)
     fusion: FusionConfig
-    calibration_monitor: CalibrationMonitorConfig = CalibrationMonitorConfig()
-    tracker: TrackerConfig = TrackerConfig()
-    mapping: MapConfig = MapConfig()
+    calibration_monitor: CalibrationMonitorConfig = Field(default_factory=CalibrationMonitorConfig)
+    tracker: TrackerConfig = Field(default_factory=TrackerConfig)
+    mapping: MapConfig = Field(default_factory=MapConfig)
     api: ApiConfig
-    research: ResearchConfig = ResearchConfig()
+    research: ResearchConfig = Field(default_factory=ResearchConfig)
 
 
 def load_config(path: str | Path) -> ScannerConfig:
@@ -163,4 +183,16 @@ def load_config(path: str | Path) -> ScannerConfig:
     raw = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(raw, dict):
         raise ValueError("configuration root must be a YAML mapping")
+
+    # Small, explicit environment override surface for container/service deployment.
+    # Secrets are never written back into the YAML configuration.
+    api_cfg = raw.setdefault("api", {})
+    if host := os.getenv("HYBRID_SCANNER_API_HOST"):
+        api_cfg["host"] = host
+    if port := os.getenv("HYBRID_SCANNER_API_PORT"):
+        try:
+            api_cfg["port"] = int(port)
+        except ValueError as exc:
+            raise ValueError("HYBRID_SCANNER_API_PORT must be an integer") from exc
+
     return ScannerConfig.model_validate(raw)

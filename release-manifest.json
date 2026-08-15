@@ -6,314 +6,46 @@
     "config_sha256": "26f93fe6028369a84f3cb8376ea44050e876ea5e9be4bf47dc076c40ddef4e31",
     "node_id": "scanner-01"
   },
-  "files": [
-    {
-      "bytes": 90,
-      "path": ".dockerignore",
-      "sha256": "dca6b569a76ac3aa1338cfd55a002effd38e5d1ac420789846bc8cd6d4cf497e"
-    },
-    {
-      "bytes": 49,
-      "path": ".env.example",
-      "sha256": "63824f0ad1b6d24340c5e05d88017ff743721beb060f6d3ac775533986e62f0d"
-    },
-    {
-      "bytes": 229,
-      "path": ".github/dependabot.yml",
-      "sha256": "c5918e7c3028d32b389214871ed3cf30f73b5bdebe5278896838bd092e4fce7f"
-    },
-    {
-      "bytes": 577,
-      "path": ".github/workflows/ci.yml",
-      "sha256": "545080dff9472a7bbcd8b68af40e9ad999b6883bb51b2e82d49939de9bc8f2f7"
-    },
-    {
-      "bytes": 160,
-      "path": ".gitignore",
-      "sha256": "48b67a84822fb1c81516062433d0c20096da0eeaa226e081daf24432aaddb8cf"
-    },
-    {
-      "bytes": 742,
-      "path": "CHANGELOG.md",
-      "sha256": "adfc0f353e52c6e67093ca4038ecc222f90fda77a75ef36c022f6348174b7923"
-    },
-    {
-      "bytes": 563,
-      "path": "Dockerfile",
-      "sha256": "2ced5cd56a18746addfc848eae8cd42165223a2e14a684ac5fa3966c69ab82e9"
-    },
-    {
-      "bytes": 1079,
-      "path": "LICENSE",
-      "sha256": "950ea4b5784ee1b7ceb435031d4bed9c1e3c671fb07af94d00be86ceca2b11fa"
-    },
-    {
-      "bytes": 445,
-      "path": "Makefile",
-      "sha256": "8e6b2f52d91dec0859cc4a8351a75e0ff813707519b870ca4ca7965782693bbc"
-    },
-    {
-      "bytes": 4191,
-      "path": "README.md",
-      "sha256": "6ac10dc43423dd0d75f955a0ee569f596ec95e78632c7d578cc64495f0cf2219"
-    },
-    {
-      "bytes": 810,
-      "path": "SECURITY.md",
-      "sha256": "3fe61050c8b030a43857a517643b920aeb08b4f34acdb4cd14f6afbed86ff5c4"
-    },
-    {
-      "bytes": 1723,
-      "path": "TEST_REPORT.md",
-      "sha256": "fe9f1efb8b8264d2ca2153f9e8605e4d159d71c0da5d51e934f1a4a96142dba6"
-    },
-    {
-      "bytes": 2023,
-      "path": "config/scanner_config.yaml",
-      "sha256": "26f93fe6028369a84f3cb8376ea44050e876ea5e9be4bf47dc076c40ddef4e31"
-    },
-    {
-      "bytes": 318,
-      "path": "docker-compose.yml",
-      "sha256": "f9c72680687c5618c37439409745da7dea43f50141b4783d51ec5798e7892f34"
-    },
-    {
-      "bytes": 2312,
-      "path": "docs/ARCHITECTURE.md",
-      "sha256": "47027178bdb25c9e0933e75df54a30ac868e5638906d7c66a88a00a4b2875c9d"
-    },
-    {
-      "bytes": 849,
-      "path": "docs/CALIBRATION.md",
-      "sha256": "c8e25acad78603178c793fba4a2e3bc2f84c5e4e643ce760e01c49727febeef5"
-    },
-    {
-      "bytes": 3062,
-      "path": "docs/CODE_REVIEW.md",
-      "sha256": "f12e487bcc621153c61ca8836d073080948537ad01d66f7bb13f9caa2a59bffa"
-    },
-    {
-      "bytes": 1044,
-      "path": "docs/DEPLOYMENT.md",
-      "sha256": "dc747866b1692241f81f7e2c79762742c8f026f29268ef575a621556ea1a1e69"
-    },
-    {
-      "bytes": 2161,
-      "path": "docs/HARDWARE_ACCEPTANCE.md",
-      "sha256": "9e950bc98eca0c70c711a98aa8fd0879cb9492db72d209dc90c3ba7189f45f30"
-    },
-    {
-      "bytes": 8020,
-      "path": "docs/LINE_BY_LINE_AUDIT.md",
-      "sha256": "2fc071eede26c036fa7695ce04b29cd78cfb78d89f25ede65e81e8fa64d2026c"
-    },
-    {
-      "bytes": 3161,
-      "path": "docs/NOVEL_CONCEPTS.md",
-      "sha256": "cd78e5e370ebaa1eceb2dd5f75fc737c1f59b3e3a616f178c51e4ff66a8e47e4"
-    },
-    {
-      "bytes": 1964,
-      "path": "docs/PRODUCTION_CHECKLIST.md",
-      "sha256": "1a2db5c7efd77705a04d172f70bd15c77de87d752b0d70c985d0f4a115705f08"
-    },
-    {
-      "bytes": 724,
-      "path": "docs/REFERENCES.md",
-      "sha256": "48890171db411921b73eafdcaf6b589c0110c2dda563165a8a07d91ea1475a17"
-    },
-    {
-      "bytes": 1070,
-      "path": "docs/THREAT_MODEL.md",
-      "sha256": "88403f34333f4ed00defdd216190cc770ad679214d50c59c3b089feb56f00084"
-    },
-    {
-      "bytes": 428,
-      "path": "firmware/profiles/README.md",
-      "sha256": "f21063e4cf783a4d2fc7e84639cea0949ffbe60f930f4003843572272e41bd34"
-    },
-    {
-      "bytes": 506,
-      "path": "firmware/profiles/iwr6843_example.cfg",
-      "sha256": "0b1a97ae1ede79eb22e7e2d10ffce9bf7c36ad51cd6e2d474093529c737d498f"
-    },
-    {
-      "bytes": 1079,
-      "path": "pyproject.toml",
-      "sha256": "0765157c04c76b7f2cc695c9a059dae5dbe00a693c8f357d1cc815b82761a335"
-    },
-    {
-      "bytes": 10,
-      "path": "requirements-dev.txt",
-      "sha256": "9d6d2c2e18451cd8eb86a739cbcb1664e4342ef4ae478266a3c333dd4f73674a"
-    },
-    {
-      "bytes": 81,
-      "path": "requirements-hardware.txt",
-      "sha256": "71ade0486aefccba9c82f14e91c49f778d1b80bf3a9054b2843b3417ffce88ad"
-    },
-    {
-      "bytes": 5,
-      "path": "requirements.txt",
-      "sha256": "0cac0e472eba3359aa79e9674ff11a5fd0484b9c465fc1cb774c30938edcc5d7"
-    },
-    {
-      "bytes": 3026,
-      "path": "scripts/calibrate_from_csv.py",
-      "sha256": "482c6bf48292618410f36e4bbf32dfec2966661c2677dad3effdf88e76e794e2"
-    },
-    {
-      "bytes": 1921,
-      "path": "scripts/generate_release_manifest.py",
-      "sha256": "8d034b1814ce85f1625dbfa1c4b8148c0902458af99d8cfff034d4d1e4a58fb1"
-    },
-    {
-      "bytes": 818,
-      "path": "scripts/systemd/hybrid-rf-scanner.service",
-      "sha256": "410eb59d1a2a662570e56ec7723ba132af1e07d6f1aaf84035b38182933fe168"
-    },
-    {
-      "bytes": 22,
-      "path": "src/hybrid_scanner/__init__.py",
-      "sha256": "ffb3a541d6d590ae2369dd022dda48d20ad3fb31006feaa01661f9985cc35e20"
-    },
-    {
-      "bytes": 4659,
-      "path": "src/hybrid_scanner/api.py",
-      "sha256": "394bc3371b240de230791fde1722bc4c2ad103845eae817e550f115b04ed364e"
-    },
-    {
-      "bytes": 1686,
-      "path": "src/hybrid_scanner/calibration_monitor.py",
-      "sha256": "e730a5b88014b96b22bf66bb2595ecb10a122fa3e5c364baefab187e1af1701f"
-    },
-    {
-      "bytes": 3030,
-      "path": "src/hybrid_scanner/cli.py",
-      "sha256": "145b525c2b6675208eef1ca5aeebea32dd4aff6201e5911e8a54221142724d8c"
-    },
-    {
-      "bytes": 6348,
-      "path": "src/hybrid_scanner/config.py",
-      "sha256": "a89b0335f01449ca5c07af5648fc01c9e4db84297fb57cc3c1377fed311181fe"
-    },
-    {
-      "bytes": 13417,
-      "path": "src/hybrid_scanner/engine.py",
-      "sha256": "159d129e50cce7752a83d109e025337db9a452232574ad6a1c2a305c8951c364"
-    },
-    {
-      "bytes": 4965,
-      "path": "src/hybrid_scanner/fusion.py",
-      "sha256": "1c68629d295cb96873da2daa966ecd7d9aa57ead687a11c805e942082045f798"
-    },
-    {
-      "bytes": 2627,
-      "path": "src/hybrid_scanner/guidance.py",
-      "sha256": "ef2e2a7c93d79e2502b91ad78db8c9258d136ae32983c6a67da95739c5fb42b8"
-    },
-    {
-      "bytes": 2375,
-      "path": "src/hybrid_scanner/health.py",
-      "sha256": "cf7b0f36758badfa31a871247765d3a4b375e2258b5c18b5ad9a76e332086f1c"
-    },
-    {
-      "bytes": 3241,
-      "path": "src/hybrid_scanner/mapping.py",
-      "sha256": "32f288b9fbb24ebed3290bd813b6e099d8c1fa8cd2c458f93d3eef0d2da43bce"
-    },
-    {
-      "bytes": 2366,
-      "path": "src/hybrid_scanner/models.py",
-      "sha256": "957325711f37c82cb40a53632ffc5e153fac79fb6929ccd15229592a703b9e3b"
-    },
-    {
-      "bytes": 0,
-      "path": "src/hybrid_scanner/radar/__init__.py",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-    },
-    {
-      "bytes": 12281,
-      "path": "src/hybrid_scanner/radar/ti_iwr6843.py",
-      "sha256": "9e636f20503176a6f571a2c9bf9a5ab41c25bfb2813fb10fcee3c4faf3df541d"
-    },
-    {
-      "bytes": 1240,
-      "path": "src/hybrid_scanner/recording.py",
-      "sha256": "644820a3551dcfc1186c7c4d97ed325882ab2e3ec2c8f826a01dddc30bae9b59"
-    },
-    {
-      "bytes": 1945,
-      "path": "src/hybrid_scanner/simulation.py",
-      "sha256": "3109f336eb073b4b171bd3b8d7230a10be52e68f84b511116f023b6a427b5a11"
-    },
-    {
-      "bytes": 1064,
-      "path": "src/hybrid_scanner/state.py",
-      "sha256": "bf5e2e918c1eed581dfa04a97cd3456eb3b0e24c16f4b7d1b593f1b9d26c3293"
-    },
-    {
-      "bytes": 2112,
-      "path": "src/hybrid_scanner/sync.py",
-      "sha256": "a7ca2f5507e2b19f30aeb72b1f4e64998de7fea36444ed90843cff602c62e38e"
-    },
-    {
-      "bytes": 5019,
-      "path": "src/hybrid_scanner/tracking.py",
-      "sha256": "aa192dd7e2ee99d11cb96a17f80d8ad92f701a321e013bfc4aad680853ce503f"
-    },
-    {
-      "bytes": 0,
-      "path": "src/hybrid_scanner/vision/__init__.py",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-    },
-    {
-      "bytes": 4627,
-      "path": "src/hybrid_scanner/vision/realsense.py",
-      "sha256": "42a7d41b3d79ff99105bc4938df7aea8520e6441e17888911585069c4a06be3f"
-    },
-    {
-      "bytes": 2284,
-      "path": "src/hybrid_scanner/workers.py",
-      "sha256": "11f7acfef550bca9a921c128cd935517d3a191e828603311dd4e41d96b824dbc"
-    },
-    {
-      "bytes": 659,
-      "path": "tests/test_calibration_monitor.py",
-      "sha256": "04d7cb9f74bdfa16192c7f2254079d15760d0cb511746777fecc26affe9297ad"
-    },
-    {
-      "bytes": 650,
-      "path": "tests/test_config.py",
-      "sha256": "c832bd70ecb3933d7557a15eb93355ce6a467df2e30921dda1ae55a55736a855"
-    },
-    {
-      "bytes": 803,
-      "path": "tests/test_fusion.py",
-      "sha256": "56bc106f1e4e7e81a5533617e13ae17fae349f790537098694a669281764dcdf"
-    },
-    {
-      "bytes": 787,
-      "path": "tests/test_mapping_guidance.py",
-      "sha256": "cce0403b4ff8245d6084eb425956089a357823cc7559267904d2d91b79446b93"
-    },
-    {
-      "bytes": 743,
-      "path": "tests/test_sync.py",
-      "sha256": "506d5e088632bc25a93f450da4487cc91a381dc2f4f9ead60b059a3c43226376"
-    },
-    {
-      "bytes": 1321,
-      "path": "tests/test_ti_parser.py",
-      "sha256": "2d75374d6ad707721013a0c1efae891a92af4805b90f84f1bf3be1ace5eda18b"
-    },
-    {
-      "bytes": 872,
-      "path": "tests/test_tracking.py",
-      "sha256": "5303639aaed301977651c1ed1b7df1a2ce12774b0396bb20d670757d4ac86605"
-    }
-  ],
-  "platform": "Linux-6.18.35-x86_64-with-glibc2.41",
-  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
-  "schema": "hybrid-rf-scanner.release-manifest.v1"
+  "files": {
+    ".dockerignore": "dca6b569a76ac3aa1338cfd55a002effd38e5d1ac420789846bc8cd6d4cf497e",
+    ".env.example": "63824f0ad1b6d24340c5e05d88017ff743721beb060f6d3ac775533986e62f0d",
+    ".github/dependabot.yml": "c5918e7c3028d32b389214871ed3cf30f73b5bdebe5278896838bd092e4fce7f",
+    ".github/workflows/ci.yml": "e04aa66f24592bc038749050c642b0960b6dd52c007d58f26f49f5efeb1ec034",
+    ".gitignore": "48b67a84822fb1c81516062433d0c20096da0eeaa226e081daf24432aaddb8cf",
+    "Dockerfile": "2ced5cd56a18746addfc848eae8cd42165223a2e14a684ac5fa3966c69ab82e9",
+    "Makefile": "1d8bbaeb9464bf58058ed781789054b41c53c901023aea75f5cf57d0484303ad",
+    "config/scanner_config.yaml": "26f93fe6028369a84f3cb8376ea44050e876ea5e9be4bf47dc076c40ddef4e31",
+    "docker-compose.yml": "2c68a4f116dc85175644c03aa3c68026e454ab6d14a6869bcbf3d048b5e6d99a",
+    "firmware/profiles/README.md": "f21063e4cf783a4d2fc7e84639cea0949ffbe60f930f4003843572272e41bd34",
+    "firmware/profiles/iwr6843_example.cfg": "0b1a97ae1ede79eb22e7e2d10ffce9bf7c36ad51cd6e2d474093529c737d498f",
+    "pyproject.toml": "a75a232ff3e66789cee9551608003bae3dfd64c13fde7999521935c26c1fcd0a",
+    "requirements-dev.txt": "9d6d2c2e18451cd8eb86a739cbcb1664e4342ef4ae478266a3c333dd4f73674a",
+    "requirements-hardware.txt": "71ade0486aefccba9c82f14e91c49f778d1b80bf3a9054b2843b3417ffce88ad",
+    "requirements.txt": "0cac0e472eba3359aa79e9674ff11a5fd0484b9c465fc1cb774c30938edcc5d7",
+    "scripts/calibrate_from_csv.py": "482c6bf48292618410f36e4bbf32dfec2966661c2677dad3effdf88e76e794e2",
+    "scripts/generate_release_manifest.py": "ce038f24e45556d7eda5f7c3d2dc640636d1c72c00ac8d6ac243368a0b8ea581",
+    "scripts/systemd/hybrid-rf-scanner.service": "415864ccb0bf4aae4f0627b21fbd508d7915140d6bbbefe848fe107300852d9a",
+    "src/hybrid_scanner/__init__.py": "c00c642bcc35defaa8178ec0f22a96752948811457999890d11e3078f65fce1b",
+    "src/hybrid_scanner/api.py": "10e716bf71aa06f2fb2e401915f80fab4aa05151d49fb35100e93065191d64ce",
+    "src/hybrid_scanner/calibration_monitor.py": "e730a5b88014b96b22bf66bb2595ecb10a122fa3e5c364baefab187e1af1701f",
+    "src/hybrid_scanner/cli.py": "4fe7bea18c753972659d824c1ef099e626468e0474c6a2fa722b8be3ea124568",
+    "src/hybrid_scanner/config.py": "459e518a9f23f9ce409106c4141c8832dcb532dc0d9c818e76975124d79a4c69",
+    "src/hybrid_scanner/engine.py": "9f844202a77ef8be28dee5228bb3fcbb2b1078f72be7176f85199b1eec7d41b4",
+    "src/hybrid_scanner/fusion.py": "3cefb1b5d318a2e831a46ca5a778a8e3152286caa3d75a69a7a5757f34d85ba7",
+    "src/hybrid_scanner/guidance.py": "ef2e2a7c93d79e2502b91ad78db8c9258d136ae32983c6a67da95739c5fb42b8",
+    "src/hybrid_scanner/health.py": "cf7b0f36758badfa31a871247765d3a4b375e2258b5c18b5ad9a76e332086f1c",
+    "src/hybrid_scanner/mapping.py": "32f288b9fbb24ebed3290bd813b6e099d8c1fa8cd2c458f93d3eef0d2da43bce",
+    "src/hybrid_scanner/models.py": "957325711f37c82cb40a53632ffc5e153fac79fb6929ccd15229592a703b9e3b",
+    "src/hybrid_scanner/radar/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/hybrid_scanner/radar/ti_iwr6843.py": "9e636f20503176a6f571a2c9bf9a5ab41c25bfb2813fb10fcee3c4faf3df541d",
+    "src/hybrid_scanner/recording.py": "54dd6566dae2a65c5a3f11ba5b68051f5693a47871d8426c2bb94cf92e152f86",
+    "src/hybrid_scanner/simulation.py": "3109f336eb073b4b171bd3b8d7230a10be52e68f84b511116f023b6a427b5a11",
+    "src/hybrid_scanner/state.py": "f7ec6939a4698b98eefc349c7ecf8b5b5aef4ebc43b26daf452e08eb62dba644",
+    "src/hybrid_scanner/sync.py": "07a30781be98d3cab0341f2c5956deeada39cb83961ce09ed4cc063a6a6e2b19",
+    "src/hybrid_scanner/tracking.py": "efeced926c1a2234d55f9fcdf3e1abd3ce05951a8df81c77b45c2521a41c387a",
+    "src/hybrid_scanner/vision/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/hybrid_scanner/vision/realsense.py": "42a7d41b3d79ff99105bc4938df7aea8520e6441e17888911585069c4a06be3f",
+    "src/hybrid_scanner/workers.py": "11f7acfef550bca9a921c128cd935517d3a191e828603311dd4e41d96b824dbc"
+  },
+  "schema": "hybrid-rf-scanner.release-manifest.v2"
 }
