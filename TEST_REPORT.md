@@ -35,6 +35,6 @@ Covered behaviors include:
 
 ## Release decision
 
-**Software release 2.0.1: suitable for GitHub CI and hardware acceptance testing once the GitHub matrix is green.**
+**Software release 2.0.1: GitHub CI is green across Python 3.10, 3.11, and 3.12; suitable for hardware acceptance testing.**
 
 **Field-production deployment remains blocked until hardware acceptance passes on the exact TI firmware, D435i, mount, cables, power system and compute platform.**
