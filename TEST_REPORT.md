@@ -44,6 +44,8 @@ Covered behaviors include:
 
 ## Defects corrected in 2.0.1
 
+- Clean GitHub CI exposed a missing `httpx2` dev dependency required by current Starlette `TestClient`; the dev extra now installs it explicitly.
+- GitHub workflow actions were upgraded to Node-24-based checkout/setup-python major versions.
 - Docker port publishing could not reach an API bound to container loopback.
 - Fused readiness could remain true during prolonged radar/camera pairing failure.
 - `tracker.enabled` was not honored.

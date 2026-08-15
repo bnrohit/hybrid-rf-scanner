@@ -2,6 +2,8 @@
 
 ## 2.0.1 — 2026-08-15
 
+- Added `httpx2` to dev/test dependencies for Starlette 1.x `TestClient` compatibility on clean CI runners.
+- Upgraded GitHub Actions checkout/setup-python steps to Node-24-based major versions.
 - Fixed container API reachability while preserving token protection.
 - Added explicit container/service API host/port environment overrides.
 - Made fusion confidence fully radar-trust-gated and added multi-neighbor depth corroboration.
