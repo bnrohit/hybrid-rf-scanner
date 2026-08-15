@@ -1,0 +1,98 @@
+app:
+  name: hybrid-rf-scanner
+  node_id: scanner-01
+  log_level: INFO
+  log_file: logs/scanner.log
+  log_rotation: 25 MB
+  loop_hz: 20
+  recording_enabled: true
+  recording_path: recordings/events.jsonl
+  recording_queue_size: 10000
+  privacy_mode: true
+
+radar:
+  enabled: true
+  config_port: /dev/ttyACM0
+  data_port: /dev/ttyACM1
+  config_baud: 115200
+  data_baud: 921600
+  read_timeout_s: 0.20
+  cli_response_timeout_s: 0.35
+  profile_path: firmware/profiles/iwr6843_example.cfg
+  header_format: xwr68xx_40
+  tlv_length_mode: auto
+  max_packet_bytes: 262144
+  max_coordinate_m: 50.0
+  reconnect_initial_s: 0.5
+  reconnect_max_s: 10.0
+
+vision:
+  enabled: true
+  serial_number: null
+  width: 640
+  height: 480
+  fps: 30
+  timeout_ms: 1000
+  max_points: 30000
+  min_depth_m: 0.20
+  max_depth_m: 6.0
+  reconnect_initial_s: 0.5
+  reconnect_max_s: 10.0
+
+sync:
+  max_skew_ms: 60.0
+  buffer_size: 120
+  stale_sensor_ms: 1500.0
+
+fusion:
+  calibration_validated: false
+  calibration_rmse_m: null
+  calibration_p95_m: null
+  radar_to_camera:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [0.0, 0.0, 0.0, 1.0]
+  max_pairing_distance_m: 0.35
+  min_snr_db: 6.0
+  min_confidence: 0.35
+  radar_sigma_at_high_snr_m: 0.035
+  radar_sigma_at_low_snr_m: 0.18
+  vision_sigma_m: 0.025
+  no_vision_penalty: 0.82
+
+calibration_monitor:
+  enabled: true
+  window_size: 300
+  min_samples: 30
+  median_warn_m: 0.12
+  p95_warn_m: 0.25
+  fail_readiness_on_drift: false
+
+tracker:
+  enabled: true
+  association_gate_m: 0.70
+  confirmation_hits: 3
+  max_misses: 8
+  process_noise: 0.8
+  default_measurement_sigma_m: 0.12
+
+mapping:
+  enabled: true
+  voxel_size_m: 0.10
+  hit_log_odds: 0.85
+  decay_per_s: 0.04
+  prune_below: 0.08
+  max_voxels: 30000
+
+api:
+  host: 127.0.0.1
+  port: 8080
+  auth_token_env: HYBRID_SCANNER_API_TOKEN
+  allow_unauthenticated_loopback: true
+
+research:
+  active_scan_guidance: true
+  raw_adc_pipeline_enabled: false
+  multi_node_fusion_enabled: false
+  learned_classifier_enabled: false

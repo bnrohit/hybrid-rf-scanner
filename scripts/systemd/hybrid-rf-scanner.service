@@ -1,0 +1,33 @@
+[Unit]
+Description=Hybrid RF Scanner 2.0
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=scanner
+Group=scanner
+SupplementaryGroups=dialout video render
+WorkingDirectory=/opt/hybrid-rf-scanner
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=-/etc/hybrid-rf-scanner.env
+ExecStart=/opt/hybrid-rf-scanner/.venv/bin/hybrid-scanner run --mode fused --api
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+ReadWritePaths=/opt/hybrid-rf-scanner/logs /opt/hybrid-rf-scanner/recordings
+
+[Install]
+WantedBy=multi-user.target
