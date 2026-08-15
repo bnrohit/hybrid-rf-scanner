@@ -2,6 +2,8 @@
 
 ## 2.0.1 — 2026-08-15
 
+- Raised the build/dev setuptools floor to `>=83` after GitHub `pip-audit` flagged PYSEC-2026-3447 in runner setuptools 79.0.1.
+- Migrated project license metadata to the current SPDX string form.
 - Added `httpx2` to dev/test dependencies for Starlette 1.x `TestClient` compatibility on clean CI runners.
 - Upgraded GitHub Actions checkout/setup-python steps to Node-24-based major versions.
 - Fixed container API reachability while preserving token protection.

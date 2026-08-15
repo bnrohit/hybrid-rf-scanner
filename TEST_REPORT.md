@@ -7,64 +7,34 @@ Date: 2026-08-15
 Final local regression suite: **20 passed**.
 
 Covered behaviors include:
-- TI TLV length mode: header-inclusive
-- TI TLV length mode: payload-only
+- TI TLV header-inclusive and payload-only length modes
 - signed TI SNR/noise side information
 - configuration and rigid-transform validation
-- validated-calibration metrics are mandatory
-- calibration monitor window/sample validation
+- mandatory validated-calibration RMSE/P95 metrics
+- calibration monitor validation
 - radar/vision timestamp-skew gating
 - timestamp-based radar delivery across firmware frame-number resets
-- duplicate/stale radar-frame prevention
-- zero-trust radar produces no fused measurement
-- uncorroborated radar measurements are confidence-penalized
+- zero-trust radar suppression
+- uncorroborated-target confidence penalty
 - uncertainty-aware radar/depth fusion
 - persistent multi-target tracking and confirmation
 - calibration drift alerting
 - sparse scene mapping and active scan guidance
-- recorder close/error state handling
+- bounded recorder shutdown/error state
 - minimal public health response
-- authenticated metrics endpoint for remote API mode
+- protected metrics for remote API mode
 - remote API binding rejected without a token
-- explicit API host environment override
+- API host environment override
 
-## Smoke/build checks completed
+## GitHub clean-runner findings corrected
 
-- Python bytecode compilation for `src/`, `tests/`, and `scripts/`
-- editable package installation with locally available build tooling
-- `hybrid-scanner version`
-- `hybrid-scanner doctor`
-- end-to-end deterministic simulation
-- clean engine shutdown
-- bounded JSONL event recording
-- local API `/health`, `/ready`, and `/version`
-- YAML parsing for application config, Docker Compose, CI, and Dependabot files
-- wheel build using `--no-build-isolation`
-- AST-based unused-import scan
-
-## Defects corrected in 2.0.1
-
-- Clean GitHub CI exposed a missing `httpx2` dev dependency required by current Starlette `TestClient`; the dev extra now installs it explicitly.
-- GitHub workflow actions were upgraded to Node-24-based checkout/setup-python major versions.
-- Docker port publishing could not reach an API bound to container loopback.
-- Fused readiness could remain true during prolonged radar/camera pairing failure.
-- `tracker.enabled` was not honored.
-- Low radar trust could still yield overly strong fused confidence.
-- Radar delivery used firmware frame numbers, which can reset after reconnect.
-- Recorder errors/drop state were not operationally visible.
-- API shutdown was not explicitly coordinated with engine shutdown.
-- Startup failure could leave partially started resources behind.
-- Calibration validation allowed an asserted boolean without quality metrics.
-- Remote `/metrics` exposure did not share the detailed-endpoint authentication gate.
-
-## Environment limitations
-
-Real TI IWR6843 and RealSense D435i hardware are not attached to this execution environment, so hardware behavior is **not** claimed as validated. Hardware fused mode remains blocked while `calibration_validated: false`.
-
-This execution environment does not have all project dependencies installed globally (notably `pyserial`) and outbound package installation is restricted. The project declares the missing runtime dependency correctly; GitHub CI installs the package dependencies in a clean runner before executing lint, tests, build, `pip check`, and `pip-audit`.
+- Starlette 1.x `TestClient` required `httpx2`; the dev extra now installs it explicitly.
+- GitHub Actions checkout/setup-python were upgraded to v6.
+- `pip-audit` flagged runner `setuptools 79.0.1` as PYSEC-2026-3447; build/dev tooling and CI now require `setuptools>=83`.
+- Project license metadata was moved to the current SPDX string form.
 
 ## Release decision
 
-**Software release 2.0.1: suitable for GitHub CI and hardware acceptance testing.**
+**Software release 2.0.1: suitable for GitHub CI and hardware acceptance testing once the GitHub matrix is green.**
 
-**Field-production deployment: blocked until the hardware acceptance and production checklists pass on the exact final radar firmware, camera, mount, cables, power system, and compute platform.**
+**Field-production deployment remains blocked until hardware acceptance passes on the exact TI firmware, D435i, mount, cables, power system and compute platform.**
